@@ -7,6 +7,6 @@ this truth table
 | 1 | 0 | 0|
 | 1 | 1 | 1|
 
-in to this
+in to this boolean function
 
 truthtable -> A+B'
