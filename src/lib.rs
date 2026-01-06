@@ -1,10 +1,17 @@
-use std::{collections::HashMap, ops::Div};
+use std::{collections::HashMap, iter::zip, ops::Div};
+mod operations;
+
+pub type GrayNumber = u32;
+pub type BinaryCord = usize;
 use OutputCases::*;
+
+use crate::operations::{boolean_to_cords::bool_to_cords};
 /// | inputs  | output     |
 /// |---------|------------|
 /// | xxxxxxx | 1 care     |
 /// | xxxxxxx | x DontCare |
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum OutputCases {
     Care(bool),
     DontCare
@@ -51,8 +58,26 @@ impl <const I: usize,const O : usize> TruthTable<I,O> {
         self.table.insert(i, o);
     }
 
-    pub fn as_maps() -> Vec<KarnaugthMap> {
-        Vec::new()
+    pub fn as_maps(&self) -> Vec<KarnaugthMap> {
+        let mut allmaps = Vec::new();
+        
+        //this line add N maps depending of TruthTable Outputs
+        for _ in 0..O {
+            allmaps.push(KarnaugthMap::new_map(I));
+        }
+        
+
+        for (map, out_idx) in zip(allmaps.iter_mut(),0..O) {
+            for inputs in self.table.keys() {
+                //rowcords and columns cords as binary for insertion
+                let (row_cord,column_cord) = bool_to_cords(inputs);
+
+                let outputs = self.table.get(inputs).expect("error in updating");
+                
+                map.update(row_cord, column_cord, outputs[out_idx].clone());
+            }
+        }
+        allmaps
     }
 }
 
@@ -98,13 +123,25 @@ pub struct KarnaugthMap{
     /// no se modifica
     matriz: Vec<Vec<OutputCases>>
 }
+
 impl KarnaugthMap {
     pub fn solve_as_str() -> String {
         panic!("not implemented");
     }
+    ///
+    ///
+    /// This function make a new map by default by DontCare cases
+    /// 
+    /// |  |00|01|11|10|
+    /// |--|--|--|--|--|
+    /// |00|x |x |x |x |
+    /// |01|x |x |x |x |
+    /// |11|x |x |x |x |
+    /// |10|x |x |x |x |
+    /// 
     pub fn new_map(input_size: usize) -> Self{
-        let rows = input_size.div_ceil(2) << 1;
-        let colum = input_size.div(2) << 1;
+        let rows = input_size.div(2) << 1;
+        let colum = input_size.div_ceil(2) << 1;
         let mut matriz = Vec::new();
         for _ in 0..rows {
             let mut vector = Vec::new();
@@ -115,9 +152,9 @@ impl KarnaugthMap {
         }
         KarnaugthMap { matriz: matriz }
     }
+
     pub fn printtable(&self) {
 
-        
         for i in self.matriz.iter() {
             for j in i.iter() {
                 match j {
@@ -132,4 +169,13 @@ impl KarnaugthMap {
             println!("");
         }
     }
+
+    /// !Caution
+    /// this function isn't protected by outrange
+    /// this function change the status
+    fn update(&mut self,row_cord: usize, column_cord: usize,caso: OutputCases) {
+        self.matriz[row_cord][column_cord] = caso;
+
+    }
 }
+

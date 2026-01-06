@@ -1,13 +1,16 @@
-use karnaught_solver::{OutputCases, TruthTable};
+use karnaught_solver::TruthTable;
+use karnaught_solver::OutputCases::*;
 fn main() {
+    let mut b = TruthTable::<5,2>::new();
+    b.insert([true,false,false,true,false],[Care(true),Care(false)]);
+    b.insert([true,true,false,true,false],[DontCare,Care(true)]);
+    b.insert([true,false,true,true,true],[Care(true),Care(false)]);
 
-    let mut b = TruthTable::<3,1>::new();
-    b.insert([true,false,false],[OutputCases::Care(true)]);
-    b.insert([true,true,false],[OutputCases::DontCare]);
-    b.insert([true,false,true],[OutputCases::Care(true)]);
+    let mapas = b.as_maps();
+   for i in mapas {
+    i.printtable();
+    println!("nextmap ")
+   }
 
-
-    let mapa = karnaught_solver::KarnaugthMap::new_map(8);
-    println!("{:?}",b);
-    mapa.printtable();
+   
 }
